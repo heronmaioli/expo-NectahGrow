@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import { Text, View, TextInput, Image, TouchableOpacity } from "react-native";
 import api from "../../services/api";
-import Styles from "./AddManually.scss";
+import Styles from "./styles.scss";
 
 const AddManually = ({ navigation }) => {
   const [inputValue, setInputValue] = useState("");

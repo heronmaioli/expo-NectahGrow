@@ -5,7 +5,7 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../services/api";
-import Styles from "./QrCode.scss";
+import Styles from "./styles.scss";
 
 export default function QrCode({ navigation }) {
   const [scanned, setScanned] = useState(false);

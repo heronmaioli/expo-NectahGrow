@@ -3,58 +3,58 @@ import React, { useState, useEffect } from "react";
 import {
   Button,
   Image,
-  StyleSheet,
   Text,
-  TextInput,
   Pressable,
   View,
   Modal,
   TouchableOpacity,
 } from "react-native";
-import socketClient from "socket.io-client";
-import { useIsFocused } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import io from "socket.io-client";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
-import Styles from "./Home.scss";
+import Styles from "./styles.scss";
 import api from "../../services/api";
 
-// const socket = socketClient("https://gentle-savannah-77998.herokuapp.com/");
+// const socket = io("https://gentle-savannah-77998.herokuapp.com/");
+
+const socket = io("http://192.168.0.12:80");
 
 export default function Home() {
-  const isFocused = useIsFocused();
   const [lightState, setLightState] = useState("");
   const [inExaust, setInExaust] = useState("");
   const [outExaust, setOutExaust] = useState("");
   const [ventState, setVentState] = useState("");
-
-  const [rootTimeOnValue, setRootTimeOnValue] = useState("");
-  const [rootTimeOffValue, setRootTimeOffValue] = useState("");
+  const [temperature, setTemperature] = useState(Number);
+  const [maxTemperature, setMaxTemperature] = useState(Number);
+  const [humidity, setHumidity] = useState(Number);
+  const [maxHumidity, setMaxHumidity] = useState(Number);
   const [timeOn, setTimeOn] = useState("");
   const [timeOff, setTimeOff] = useState("");
-
-  const [storage, setStorage] = useState(null);
-  const [date, setDate] = useState(new Date(1598051730000));
-
+  const [storage, setStorage] = useState("cc50e3beca24");
   const [lightModalVisible, setLightModalVisible] = useState(false);
   const [timeOnClock, setTimeOnClock] = useState(false);
   const [timeOffClock, setTimeOffClock] = useState(false);
 
-  const socket = isFocused ? socketClient("http://192.168.0.12:80") : undefined;
-
+  socket.open();
   useEffect(() => {
     (async () => {
-      const storaged = await AsyncStorage.getItem("@boardID");
-      setStorage(storaged);
-      const response = await api.post("/getStatus", { boardId: storaged });
-
-      setLightState(response.data.lightState);
-      setInExaust(response.data.inExaust);
-      setOutExaust(response.data.outExaust);
-      setVentState(response.data.ventState);
-      setTimeOn(response.data.highHour);
-      setTimeOff(response.data.lowHour);
-      console.log(response.data);
+      // const storaged = await AsyncStorage.getItem("@boardID");
+      const storaged = storage;
+      // setStorage(storaged);
+      try {
+        const response = await api.post("/getStatus", { boardId: storaged });
+        setLightState(response.data.lightState);
+        setInExaust(response.data.inExaust);
+        setOutExaust(response.data.outExaust);
+        setVentState(response.data.ventState);
+        setTemperature(response.data.temperature);
+        setHumidity(response.data.humidity);
+        setTimeOn(new Date(`Thu, 01 Jan 1970 ${response.data.highHour}`));
+        setTimeOff(new Date(`Thu, 01 Jan 1970 ${response.data.lowHour}`));
+        console.log(response.data);
+      } catch (err) {
+        console.error(err);
+      }
     })();
   }, []);
 
@@ -63,23 +63,73 @@ export default function Home() {
     setTimeOnClock(Platform.OS === "ios");
 
     if (currentDate !== undefined) {
-      setDate(currentDate);
-      const convert = moment(currentDate).format("HH:mm:ss").toString();
-      setTimeOn(convert);
-      console.log(timeOn);
+      setTimeOn(currentDate);
+
+      const formatedTimeOn = moment(currentDate).format("HH:mm:ss").toString();
+      const formatedTimeOff = moment(timeOff).format("HH:mm:ss").toString();
+      console.log(formatedTimeOn);
+      console.log(formatedTimeOff);
+
       socket.emit(
         "newTimingSetup",
-        { highHour: timeOn, lowHour: timeOff },
+        { highHour: formatedTimeOn, lowHour: formatedTimeOff },
+        storage
+      );
+    }
+  };
+  const setNewTimeOff = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setTimeOffClock(Platform.OS === "ios");
+
+    if (currentDate !== undefined) {
+      setTimeOff(currentDate);
+      const formatedTimeOn = moment(timeOn).format("HH:mm:ss").toString();
+      const formatedTimeOff = moment(currentDate).format("HH:mm:ss").toString();
+
+      console.log(formatedTimeOn);
+      console.log(formatedTimeOff);
+
+      socket.emit(
+        "newTimingSetup",
+        { highHour: formatedTimeOn, lowHour: formatedTimeOff },
         storage
       );
     }
   };
 
   socket.on("connect", () => {
-    socket.emit("selfRegister", storage);
+    socket.emit("joinRoom", storage);
   });
+
   socket.on("sensorReads", (reads) => {
+    setTemperature(reads.temperature);
+    setHumidity(reads.humidity);
     console.log(reads);
+    setCount(count + 1);
+  });
+
+  socket.on("setLightOn", () => {
+    setLightState("ON");
+  });
+  socket.on("setLightOff", () => {
+    setLightState("OFF");
+  });
+  socket.on("setLightAuto", () => {
+    setLightState("AUTO");
+  });
+  socket.on("changeVentState", () => {
+    setLightState("AUTO");
+  });
+  socket.on("changeInState", () => {
+    setLightState("AUTO");
+  });
+  socket.on("changeInState", () => {
+    setLightState("AUTO");
+  });
+
+  socket.on("newTimingSetup", (status) => {
+    setTimeOn(new Date(`Thu, 01 Jan 1970 ${status.highHour}`));
+    setTimeOff(new Date(`Thu, 01 Jan 1970 ${status.lowHour}`));
   });
 
   socket.on("message", (message) => {
@@ -237,18 +287,59 @@ export default function Home() {
                 underlayColor="white"
                 onBlur={() => setTimeOnClock(false)}
               >
-                <Text style={Styles.timeStyle}>{timeOn.substr(0, 5)}</Text>
+                <Text style={Styles.timeStyle}>
+                  {moment(timeOn).format("HH:mm")}
+                </Text>
               </TouchableOpacity>
             </View>
             <View>
               <Text style={Styles.timeLabel}>OFF AT:</Text>
               <TouchableOpacity
                 style={{ justifyContent: "center", alignItems: "center" }}
-                onLongPress={() => {}}
+                onLongPress={() => {
+                  setTimeOffClock(true);
+                }}
+                onPress={() => setTimeOffClock(false)}
                 underlayColor="white"
+                onBlur={() => setTimeOffClock(false)}
               >
-                <Text style={Styles.timeStyle}>{timeOff.substr(0, 5)}</Text>
+                <Text style={Styles.timeStyle}>
+                  {moment(timeOff).format("HH:mm")}
+                </Text>
               </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{ flex: 1, justifyContent: "space-between" }}>
+            <View style={Styles.sensorDataView}>
+              <Image
+                source={require("../../assets/Temperature.png")}
+                style={{ width: 40, height: 90 }}
+              />
+              <Text
+                style={{
+                  fontSize: 48,
+                  fontWeight: "bold",
+                  color: "#fff",
+                }}
+              >
+                {temperature + "°C"}
+              </Text>
+            </View>
+            <View style={Styles.sensorDataView}>
+              <Image
+                source={require("../../assets/Humidity.png")}
+                style={{ width: 40, height: 90 }}
+              />
+              <Text
+                style={{
+                  fontSize: 48,
+                  fontWeight: "bold",
+                  color: "#fff",
+                }}
+              >
+                {humidity + "%"}
+              </Text>
             </View>
           </View>
         </View>
@@ -257,12 +348,23 @@ export default function Home() {
       {timeOnClock && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={date}
+          value={timeOn}
           mode={"time"}
           is24Hour={true}
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={setNewTimeOn}
           onBlur={() => setTimeOnClock(false)}
+        />
+      )}
+      {timeOffClock && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={timeOff}
+          mode={"time"}
+          is24Hour={true}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={setNewTimeOff}
+          onBlur={() => setTimeOffClock(false)}
         />
       )}
     </View>
