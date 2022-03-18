@@ -10,6 +10,7 @@
 
 .logoImage {
   width: 80%;
+
   margin-bottom: 5%;
 }
 
@@ -19,11 +20,13 @@
   height: auto;
   border-radius: 5px;
   background-color: #2c302e;
+  padding: 0 7% 0 7%;
 }
 
 .formContent {
   display: flex;
   align-items: center;
+
   width: 100%;
   height: auto;
 }
@@ -33,7 +36,7 @@
   letter-spacing: 2px;
   color: #fff;
   font-weight: bold;
-  margin: 15px 15px 20px 15px;
+  margin-top: 15px;
 }
 
 .inputBox {
@@ -48,20 +51,18 @@
   color: #fff;
   font-weight: bold;
   width: 100%;
-  padding-left: 15%;
 }
 .textInput {
-  width: 70%;
+  width: 100%;
   border-radius: 5px;
   padding: 5px 15px 5px 15px;
-
   background-color: #fff;
 }
 .errorMessage {
   color: #da4b49;
   width: 100%;
+  font-weight: bold;
   letter-spacing: 1.5px;
-  padding-left: 15%;
 }
 .rememberBox {
   display: flex;
@@ -77,7 +78,7 @@
 }
 .sendButton {
   margin-bottom: 15px;
-  margin-top: 30px;
+  // margin-top: 30px;
   background-color: #fff;
   border-color: #227c9d;
   border-width: 2px;
@@ -90,7 +91,5 @@
   font-size: 14px;
   color: #227c9d;
   font-weight: bold;
-  // border-bottom-width: 1px;
-  // border-color: #227c9d;
   margin-bottom: 15px;
 }

@@ -1,14 +1,15 @@
 import React from "react";
-
-import StackNavigator from "./StackNavigation";
+import "react-native-gesture-handler";
+import Navigator from "./Navigation";
 import { NavigationContainer } from "@react-navigation/native";
-
-// const socket = socketClient("https://gentle-savannah-77998.herokuapp.com/");
+import { UserProvider } from "./context/userContext";
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <StackNavigator />
-    </NavigationContainer>
+    <UserProvider>
+      <NavigationContainer>
+        <Navigator />
+      </NavigationContainer>
+    </UserProvider>
   );
 }
