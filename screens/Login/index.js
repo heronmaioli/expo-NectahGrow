@@ -1,5 +1,4 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   SafeAreaView,
@@ -10,45 +9,37 @@ import {
   TextInput,
 } from "react-native";
 import Checkbox from "expo-checkbox";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
 import api from "../../services/api";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { UserContext } from "../../context/userContext";
 import Styles from "./styles.scss";
 
-export default function Login({ navigation, setIsLogged }) {
+export default function Login({ navigation }) {
+  const [nickname, setNickname] = useState("");
+  const [password, setPassword] = useState("");
   const [isChecked, setChecked] = useState(false);
-  const [isDenied, setIsDenied] = useState(null);
+  const [status, setStatus] = useState(null);
 
-  useEffect(() => {
-    register("nickName");
-    register("password");
-  }, [register]);
+  const { setIsLoged, setBoards } = useContext(UserContext);
 
-  const validationSchema = yup.object().shape({
-    nickName: yup
-      .string()
-      .required("Required")
-      .min(4, "Min 4 digits")
-      .max(18, "Max 18 digits"),
-    password: yup.string().required("Required"),
-  });
+  const sendRegister = async (nick, pass) => {
+    const data = {
+      nickName: nick,
+      password: pass,
+    };
+    try {
+      const response = await api.post("/login", data);
+      await AsyncStorage.setItem("@userId", response.data._id);
 
-  const {
-    register,
-    setValue,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(validationSchema),
-  });
-
-  const sendRegister = async (data) => {
-    // const { confpassword, ...infos } = data;
-    // const response = await api.put("/login", infos);
-    // response.data ? navigation.navigate("Home") : alert("");
-    console.log(data);
+      if (isChecked) {
+        await AsyncStorage.setItem("@persist", "persist");
+      }
+      setBoards(response.data.boards);
+      setIsLoged(true);
+    } catch (err) {
+      setStatus(err.response.data);
+      setPassword("");
+    }
   };
   return (
     <ScrollView
@@ -56,8 +47,6 @@ export default function Login({ navigation, setIsLogged }) {
       keyboardDismissMode="on-drag"
     >
       <SafeAreaView style={Styles.background}>
-        <StatusBar style="light" backgroundColor={"#2C302E"} />
-
         <Image
           source={require("../../assets/Logo.png")}
           style={Styles.logoImage}
@@ -65,39 +54,32 @@ export default function Login({ navigation, setIsLogged }) {
         <View style={Styles.formBox}>
           <View style={Styles.formContent}>
             <Text style={Styles.textLabel}>Login</Text>
+            {status && (
+              <View>
+                <Text style={Styles.errorMessage}>{status}</Text>
+              </View>
+            )}
             <View style={Styles.inputBox}>
               <Text style={Styles.inputLabel}>NickName</Text>
-              {isDenied && (
-                <View>
-                  <Text style={Styles.errorMessage}>{isDenied}</Text>
-                </View>
-              )}
+
               <TextInput
-                onChangeText={(text) => setValue("nickName", text)}
+                onChangeText={setNickname}
+                value={nickname}
                 placeholder={"mastergrower123"}
                 style={Styles.textInput}
                 placeholderTextColor={"#777"}
               />
-              {errors.nickName && (
-                <Text style={Styles.errorMessage}>
-                  {errors.nickName?.message}
-                </Text>
-              )}
             </View>
             <View style={Styles.inputBox}>
               <Text style={Styles.inputLabel}>Password</Text>
               <TextInput
-                onChangeText={(text) => setValue("password", text)}
+                onChangeText={setPassword}
+                value={password}
                 secureTextEntry
                 placeholder={"**********"}
                 style={Styles.textInput}
                 placeholderTextColor={"#777"}
               />
-              {errors.password && (
-                <Text style={Styles.errorMessage}>
-                  {errors.password?.message}
-                </Text>
-              )}
             </View>
             <View style={Styles.rememberBox}>
               <Checkbox
@@ -105,12 +87,12 @@ export default function Login({ navigation, setIsLogged }) {
                 onValueChange={setChecked}
                 color={"#227c9d"}
               />
-              <Text style={Styles.rememberText}>Remember password</Text>
+              <Text style={Styles.rememberText}>Keep conected</Text>
             </View>
 
             <TouchableOpacity
               style={Styles.sendButton}
-              onPress={handleSubmit(sendRegister)}
+              onPress={() => sendRegister(nickname, password)}
             >
               <Text style={{ color: "#227C9D", fontWeight: "700" }}>Login</Text>
             </TouchableOpacity>

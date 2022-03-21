@@ -1,54 +1,60 @@
-import React, { useState, useCallback } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import React, { useState, useEffect, useContext } from "react";
 import { Text, View, SafeAreaView, TouchableOpacity } from "react-native";
-import { BarCodeScanner } from "expo-barcode-scanner";
-import { StatusBar } from "expo-status-bar";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { UserContext } from "../../context/userContext";
 import api from "../../services/api";
 import Styles from "./styles.scss";
+import { Camera } from "expo-camera";
 
-export default function QrCode({ navigation }) {
+export default function QrCode({ navigation, manual }) {
   const [scanned, setScanned] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
+  const [status, setStatus] = useState(null);
+  const { boards, setBoards, user } = useContext(UserContext);
 
-  useFocusEffect(
-    useCallback(() => {
-      (async () => {
-        const { status } = await BarCodeScanner.requestPermissionsAsync();
-        status === "denied"
-          ? navigation.navigate("AddManually")
-          : setHasPermission(status === "granted");
-      })();
-      return () => {};
-    }, [])
-  );
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      status === "denied" ? manual(true) : setHasPermission(true);
+    })();
+  }, []);
 
-  const onReadSuccess = async (data) => {
-    try {
-      await AsyncStorage.setItem("@boardID", data);
-      navigation.navigate("UserRegister");
-    } catch (e) {
-      console.log(e);
-      alert("Deu erro");
-    }
-  };
-
-  const handleBarCodeScanned = ({ data }) => {
+  const handleBarCodeScanned = (data) => {
     setScanned(true);
-    const fetchData = async () => {
-      const response = await api.post("/checkboardId", { data: data });
-      response.data ? onReadSuccess(data) : alert("Product ID is incorrect!");
-    };
-    fetchData();
+    console.log(data);
+    (async () => {
+      try {
+        const response = await api.put("/registerBoard", {
+          boardId: data,
+          userId: user,
+          name: data,
+        });
+
+        setBoards([
+          ...boards,
+          { boardId: response.data.boardId, name: response.data.name },
+        ]);
+
+        navigation.navigate(response.data.name, {
+          board: response.data.boardId,
+        });
+      } catch (err) {
+        setStatus(err.response.data);
+      }
+    })();
   };
 
   return (
     <SafeAreaView style={Styles.container}>
-      <StatusBar style="light" backgroundColor={"#2C302E"} />
       {hasPermission && (
         <View style={Styles.container}>
-          <BarCodeScanner
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          <Camera
+            barCodeScannerSettings={{
+              barCodeTypes: ["qr"],
+            }}
+            onBarCodeScanned={(...args) => {
+              const data = args[0].data;
+              scanned ? undefined : handleBarCodeScanned(data);
+            }}
             style={Styles.barcode}
           >
             <View
@@ -63,19 +69,17 @@ export default function QrCode({ navigation }) {
                   style={Styles.touchArea}
                   onPress={() => setScanned(false)}
                 >
+                  <Text style={Styles.redText}>
+                    {status && status.toUpperCase()}
+                  </Text>
                   <Text style={Styles.redText}>TAP TO SCAN AGAIN</Text>
                 </TouchableOpacity>
               )}
             </View>
-          </BarCodeScanner>
+          </Camera>
           <View style={Styles.bottomTab}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("AddManually")}
-            >
+            <TouchableOpacity onPress={() => manual(true)}>
               <Text style={Styles.bottomText}>Or add manually</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => alert("go to login")}>
-              <Text style={Styles.bottomLink}>Already have an account!</Text>
             </TouchableOpacity>
           </View>
         </View>

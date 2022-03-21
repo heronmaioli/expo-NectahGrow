@@ -1,0 +1,97 @@
+.container {
+  background: #52aa5e;
+  flex: 1;
+}
+.header {
+  padding-top: 10%;
+  background: #2c302e;
+  justify-content: center;
+  align-items: center;
+  shadow-color: #000;
+  shadow-opacity: 1;
+}
+.gridView {
+  margin: 3%;
+  padding: 3%;
+  background: #2c302e;
+  border-radius: 5px;
+  shadow-color: #000;
+  shadow-opacity: 1;
+  elevation: 20;
+  flex: 1;
+  max-height: 60%;
+}
+.stGridView {
+  flex-direction: row;
+  justify-content: space-between;
+}
+.smallCard {
+  flex: 1;
+  border-radius: 5px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid white;
+  margin: 0.3%;
+  padding-top: 5px;
+}
+.centeredModal {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+.modalView {
+  background-color: white;
+  border-radius: 5px;
+  padding: 35px;
+  align-items: center;
+  shadow-color: #000;
+  shadow-opacity: 1;
+  shadow-radius: 4px;
+  elevation: 10;
+}
+.statusTitle {
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  padding-bottom: 5px;
+}
+
+.ndGridView {
+  flex-direction: row;
+  flex: 1;
+}
+.timeItem {
+  margin-top: 5px;
+  border-radius: 5px;
+  align-items: center;
+  justify-content: space-evenly;
+  border: 1px solid white;
+  width: 38%;
+}
+.timeLabel {
+  font-size: 24;
+  color: #fff;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+.timeStyle {
+  font-size: 46;
+  color: #fff;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+.sensorDataView {
+  margin-top: 5px;
+  border-radius: 5px;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-evenly;
+  flex: 1;
+  border: 1px solid white;
+  padding: 5px 0px 5px 0;
+  box-sizing: border-box;
+}

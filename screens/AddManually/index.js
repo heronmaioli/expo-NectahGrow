@@ -1,45 +1,56 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import { Text, View, TextInput, Image, TouchableOpacity } from "react-native";
-import api from "../../services/api";
-import Styles from "./styles.scss";
+import React, { useContext, useState } from 'react';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const AddManually = ({ navigation }) => {
+import { UserContext } from '../../context/userContext';
+import api from '../../services/api';
+import Styles from './styles.scss';
+
+const AddManually = ({ navigation, manual }) => {
   const [inputValue, setInputValue] = useState("");
+  const [status, setStatus] = useState(null);
+  const { boards, setBoards, user } = useContext(UserContext);
 
   const sendIt = async () => {
-    const response = await api.post("/checkboardId", { data: inputValue });
-    response.data
-      ? navigation.navigate("UserRegister")
-      : alert("Product ID is incorrect!");
+    try {
+      const response = await api.put("/registerBoard", {
+        boardId: inputValue,
+        userId: user,
+        name: inputValue,
+      });
+      setBoards([
+        ...boards,
+        { boardId: response.data.boardId, name: response.data.name },
+      ]);
+      navigation.navigate(response.data.name, { board: response.data.boardId });
+    } catch (err) {
+      setStatus(err.response.data);
+    }
   };
 
   return (
     <View style={Styles.background}>
       <View style={Styles.mainLayer}>
-        <View style={Styles.logoView}>
-          <Image
-            source={require("../../assets/Logo.png")}
-            style={{ width: 380, height: 160 }}
-          />
-        </View>
         <View style={Styles.formView}>
           <View style={Styles.formBox}>
             <Text style={Styles.textLabel}>Insert product ID</Text>
+            {status && (
+              <View>
+                <Text style={Styles.errorMessage}>{status}</Text>
+              </View>
+            )}
             <TextInput
               onChangeText={setInputValue}
               value={inputValue}
               style={Styles.textInput}
-              inlineImageRight="search_icon"
               placeholder={"ex: 246f28b45774"}
               backgroundColor={"#fff"}
               placeholderTextColor={"#777"}
             />
-            <TouchableOpacity style={Styles.sendButton}>
-              <Text
-                style={{ color: "#227C9D", fontWeight: "700" }}
-                onPress={() => sendIt()}
-              >
+            <TouchableOpacity
+              style={Styles.sendButton}
+              onPress={() => sendIt()}
+            >
+              <Text style={{ color: "#227C9D", fontWeight: "700" }}>
                 SEND IT
               </Text>
             </TouchableOpacity>
@@ -47,14 +58,10 @@ const AddManually = ({ navigation }) => {
         </View>
       </View>
       <View style={Styles.bottomTab}>
-        <TouchableOpacity onPress={() => navigation.pop()}>
+        <TouchableOpacity onPress={() => manual(false)}>
           <Text style={Styles.bottomText}>Or scan QR Code</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => alert("go to login")}>
-          <Text style={Styles.bottomLink}>Already have an account!</Text>
-        </TouchableOpacity>
       </View>
-      <StatusBar style="light" backgroundColor={"#2C302E"} />
     </View>
   );
 };

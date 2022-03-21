@@ -11,19 +11,26 @@ import { UserContext } from "./context/userContext";
 export default function CustomDrawer(props) {
   const { setUser, setIsLoged } = useContext(UserContext);
   useEffect(() => {
-    const teste = async () => {
+    (async () => {
       try {
         const fUser = await AsyncStorage.getItem("@userId");
+        if (!fUser) {
+          setIsLoged(false);
+          await AsyncStorage.removeItem("@persist");
+          await AsyncStorage.removeItem("@boards");
+          throw "User ID it's not storaged";
+        }
         setUser(fUser);
       } catch (e) {
-        console.log("deu erro");
+        console.log(e);
       }
-    };
-    teste();
+    })();
   }, []);
 
   async function logOut() {
-    await AsyncStorage.removeItem("@isLoged");
+    await AsyncStorage.removeItem("@persist");
+    await AsyncStorage.removeItem("@boards");
+    await AsyncStorage.removeItem("@userId");
     setIsLoged(false);
   }
   return (

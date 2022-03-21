@@ -22,6 +22,7 @@
       "bundleIdentifier": "com.yourcompany.yourappname",
       "buildNumber": "1.0.0",
       "supportsTablet": true,
+
       "infoPlist": {
         "NSCameraUsageDescription": "Nectah Grow will use your CAMERA just once to scan qr code product"
       }
@@ -29,6 +30,7 @@
     "android": {
       "package": "com.nectahgrow.nectahgrow",
       "versionCode": 1,
+      "permissions": ["CAMERA", "ACCESS_WIFI_STATE"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

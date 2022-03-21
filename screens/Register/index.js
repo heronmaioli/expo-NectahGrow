@@ -1,23 +1,14 @@
-import React, { useState, useEffect, useContext } from "react";
-import { StatusBar } from "expo-status-bar";
-import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
-import {
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  Text,
-  ScrollView,
-  Image,
-  TextInput,
-} from "react-native";
-import Checkbox from "expo-checkbox";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
-import api from "../../services/api";
-import Styles from "./styles.scss";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { UserContext } from "../../context/userContext";
+import { yupResolver } from '@hookform/resolvers/yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Checkbox from 'expo-checkbox';
+import React, { useContext, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import * as yup from 'yup';
+
+import { UserContext } from '../../context/userContext';
+import api from '../../services/api';
+import Styles from './styles.scss';
 
 export default function Register({ navigation }) {
   const [isChecked, setChecked] = useState(false);
@@ -30,7 +21,6 @@ export default function Register({ navigation }) {
     try {
       const response = await api.put("/registerUser", { ...infos, boards: [] });
       await AsyncStorage.setItem("@userId", response.data);
-      console.log(response.data);
       if (isChecked) {
         await AsyncStorage.setItem("@persist", "persist");
       }
@@ -38,7 +28,6 @@ export default function Register({ navigation }) {
       return;
     } catch (err) {
       setStatus(err.response.data);
-      console.log(err.response.data);
     }
   };
 
@@ -48,6 +37,7 @@ export default function Register({ navigation }) {
       .string()
       .required("Required")
       .min(4, "Min 4 digits")
+      .matches(/^[a-z]+$/, "Nickname must to contain just letters and numbers")
       .max(18, "Max 18 digits"),
     password: yup
       .string()
@@ -84,8 +74,6 @@ export default function Register({ navigation }) {
       keyboardDismissMode="on-drag"
     >
       <SafeAreaView style={Styles.background}>
-        <StatusBar style="light" backgroundColor={"#2C302E"} />
-
         <Image
           source={require("../../assets/Logo.png")}
           style={Styles.logoImage}
@@ -93,6 +81,7 @@ export default function Register({ navigation }) {
         <View style={Styles.formBox}>
           <View style={Styles.formContent}>
             <Text style={Styles.textLabel}>Create Accont</Text>
+
             {status && (
               <View>
                 <Text style={Styles.errorMessage}>{status}</Text>
@@ -165,7 +154,7 @@ export default function Register({ navigation }) {
                 onValueChange={setChecked}
                 color={"#227c9d"}
               />
-              <Text style={Styles.rememberText}>Remember password</Text>
+              <Text style={Styles.rememberText}>Keep conected</Text>
             </View>
             <TouchableOpacity
               style={Styles.sendButton}
