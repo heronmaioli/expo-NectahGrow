@@ -1,14 +1,14 @@
 .container {
   background: #52aa5e;
   flex: 1;
-}
-.header {
-  padding-top: 10%;
-  background: #2c302e;
   justify-content: center;
-  align-items: center;
-  shadow-color: #000;
-  shadow-opacity: 1;
+}
+.title {
+  width: 100%;
+  text-align: center;
+  color: #2c302e;
+  font-weight: bold;
+  font-size: 28px;
 }
 .gridView {
   margin: 3%;
@@ -19,7 +19,7 @@
   shadow-opacity: 1;
   elevation: 20;
   flex: 1;
-  max-height: 60%;
+  max-height: 80%;
 }
 .stGridView {
   flex-direction: row;

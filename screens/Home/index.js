@@ -1,6 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Network from 'expo-network';
 import React, { useContext, useEffect, useState } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Button, Text, View } from 'react-native';
 
 import { UserContext } from '../../context/userContext';
 import Styles from './styles.scss';
@@ -24,9 +25,6 @@ export default function Home({ navigation }) {
   }, []);
   return (
     <View style={Styles.container}>
-      <View style={Styles.header}>
-        <Image source={require("../../assets/Logo.png")} />
-      </View>
       <View
         style={{
           flex: 1,
@@ -36,15 +34,16 @@ export default function Home({ navigation }) {
       >
         <Text
           style={{ color: "#fff", fontSize: 20, fontWeight: "bold" }}
-          onPress={() => navigation.navigate("Add Board")}
+          onPress={() => navigation.navigate("New Grow")}
         >
-          {boards.length === 0
-            ? "No boards yet! Click here to add!"
-            : `You have ${boards.length} boards in your account`}
+          {boards?.length === 0
+            ? "No grows yet! Click here to add!"
+            : `You have ${boards.length} grow in your account`}
         </Text>
-        <Text style={{ color: "#fff", fontSize: 20, fontWeight: "bold" }}>
+
+        {/* <Text style={{ color: "#fff", fontSize: 20, fontWeight: "bold" }}>
           {isConnected ? "true" : "false"}
-        </Text>
+        </Text> */}
       </View>
     </View>
   );

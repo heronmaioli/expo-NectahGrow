@@ -1,15 +1,12 @@
-import React, { useEffect, useContext } from "react";
-import { View } from "react-native";
-import {
-  DrawerContentScrollView,
-  DrawerItemList,
-  DrawerItem,
-} from "@react-navigation/drawer";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { UserContext } from "./context/userContext";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
+import React, { useContext, useEffect } from 'react';
+import { View } from 'react-native';
+
+import { UserContext } from './context/userContext';
 
 export default function CustomDrawer(props) {
-  const { setUser, setIsLoged } = useContext(UserContext);
+  const { setUser, setIsLoged, setBoards } = useContext(UserContext);
   useEffect(() => {
     (async () => {
       try {
@@ -17,7 +14,7 @@ export default function CustomDrawer(props) {
         if (!fUser) {
           setIsLoged(false);
           await AsyncStorage.removeItem("@persist");
-          await AsyncStorage.removeItem("@boards");
+          await AsyncStorage.setItem("@boards", []);
           throw "User ID it's not storaged";
         }
         setUser(fUser);
@@ -28,10 +25,15 @@ export default function CustomDrawer(props) {
   }, []);
 
   async function logOut() {
-    await AsyncStorage.removeItem("@persist");
-    await AsyncStorage.removeItem("@boards");
-    await AsyncStorage.removeItem("@userId");
-    setIsLoged(false);
+    try {
+      await AsyncStorage.removeItem("@persist");
+      await AsyncStorage.removeItem("@boards");
+      await AsyncStorage.removeItem("@userId");
+      setBoards([]);
+      setIsLoged(false);
+    } catch (err) {
+      console.log(err);
+    }
   }
   return (
     <View style={{ flex: 1 }}>

@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerItem } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Network from 'expo-network';
 import React, { useContext, useEffect, useState } from 'react';
@@ -22,7 +22,7 @@ const Stack = createNativeStackNavigator();
 function Navigator() {
   const { isLoged, setIsLoged, boards, setBoards } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
 
   const dimensions = useWindowDimensions();
 
@@ -39,6 +39,9 @@ function Navigator() {
         if (userId) {
           const response = await api.get("/verify?user=" + userId);
           setBoards(response.data.boards);
+          console.log(response);
+          console.log("aqui");
+          console.log(response.data.boards);
         }
         if (persist) {
           setIsLoged(true);
@@ -58,7 +61,7 @@ function Navigator() {
             drawerPosition: "right",
             swipeEdgeWidth: dimensions.width,
             unmountOnBlur: true,
-            headerTitle: (props) => <Header props={props} />,
+            header: (props) => <Header props={props} />,
           }}
           drawerContent={(props) => (
             <CustomDrawer {...props} setIsLoged={setIsLoged} />
@@ -66,17 +69,19 @@ function Navigator() {
           backBehavior={"history"}
         >
           <Drawer.Screen name={"Home"} component={Home} />
+
           {boards.map((board) => {
             return (
               <Drawer.Screen
                 key={boards.length}
                 name={board.name}
                 component={BoardScreen}
+                d
                 initialParams={{ board: board.boardId }}
               />
             );
           })}
-          <Drawer.Screen name={"Add Board"} component={AddBoard} />
+          <Drawer.Screen name={"New Grow"} component={AddBoard} />
         </Drawer.Navigator>
       )}
 

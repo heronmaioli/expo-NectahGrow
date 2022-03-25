@@ -1,19 +1,18 @@
-import React, { useState } from "react";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useState } from 'react';
 
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AddManually from '../AddManually';
+import QrCode from '../QrCode';
 
-import QrCode from "../QrCode";
-import AddManually from "../AddManually";
+const Stack = createNativeStackNavigator();
 
-export default function AddBoard() {
-  const [manual, setManual] = useState(false);
+export default function AddBoard({ navigation }) {
   return (
     <>
-      {manual ? (
-        <AddManually manual={setManual} />
-      ) : (
-        <QrCode manual={setManual} />
-      )}
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name={"QrCode"} component={QrCode} />
+        <Stack.Screen name={"AddManually"} component={AddManually} />
+      </Stack.Navigator>
     </>
   );
 }

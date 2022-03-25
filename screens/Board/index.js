@@ -1,19 +1,11 @@
-import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Image,
-  Text,
-  Pressable,
-  View,
-  Modal,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import io from "socket.io-client";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import moment from "moment";
-import Styles from "./styles.scss";
-import api from "../../services/api";
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Button, Image, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import io from 'socket.io-client';
+
+import api from '../../services/api';
+import Styles from './styles.scss';
 
 // const socket = io("https://gentle-savannah-77998.herokuapp.com/");
 const socket = io("http://192.168.0.12:80");
@@ -131,12 +123,10 @@ export default function BoardScreen({ route }) {
     console.log("disconected");
   });
 
+  console.log(route);
   return (
     <View style={Styles.container}>
-      <View style={Styles.header}>
-        <Image source={require("../../assets/Logo.png")} />
-      </View>
-
+      <Text style={Styles.title}>{route.name}</Text>
       <View style={Styles.gridView}>
         {isLoading ? (
           <View style={{ flex: 1, justifyContent: "center" }}>

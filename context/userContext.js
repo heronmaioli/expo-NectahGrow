@@ -16,25 +16,14 @@ import React, { createContext, useState } from 'react';
 //   setHasConnection: React.Dispatch<React.SetStateAction<boolean>>;
 // };
 
-const defaultValues = {
-  boards: null,
-  setBoards: () => {},
-  isLoged: false,
-  setIsLoged: () => {},
-  user: null,
-  setUser: () => {},
-  hasConnection: true,
-  setHasConnection: () => {},
-};
-
-export const UserContext = createContext(defaultValues);
+export const UserContext = createContext({});
 
 export const UserProvider = ({ children }) => {
-  const [boards, setBoards] = useState(null);
+  const [boards, setBoards] = useState([]);
   const [isLoged, setIsLoged] = useState(false);
   const [user, setUser] = useState(null);
   const [hasConnection, setHasConnection] = useState(true);
-
+  console.log(boards);
   return (
     <UserContext.Provider
       value={{

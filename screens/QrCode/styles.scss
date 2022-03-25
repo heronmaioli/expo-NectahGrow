@@ -2,6 +2,7 @@
   flex: 1;
   background-color: #52aa5e;
 }
+
 .barcode {
   flex: 1;
   align-items: center;
@@ -15,12 +16,12 @@
   border-radius: 5px;
   align-items: center;
   justify-content: center;
-  margin-top: 40%;
+  margin-top: 25%;
 }
 .whiteText {
   color: (rgba(255, 255, 255, 0.3));
   font-size: 18;
-  font-weight: 900;
+  font-weight: bold;
 }
 
 .insideSquareRed {
@@ -30,12 +31,12 @@
   border-radius: 5px;
   align-items: center;
   justify-content: center;
-  margin-top: 40%;
+  margin-top: 25%;
 }
 .redText {
   color: #c3423f;
   font-size: 18;
-  font-weight: 900;
+  font-weight: bold;
 }
 .touchArea {
   flex: 1;

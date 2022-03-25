@@ -37,7 +37,10 @@ export default function Register({ navigation }) {
       .string()
       .required("Required")
       .min(4, "Min 4 digits")
-      .matches(/^[a-z]+$/, "Nickname must to contain just letters and numbers")
+      .matches(
+        /^[A-Za-z]+$/,
+        "Nickname must to contain just letters and numbers"
+      )
       .max(18, "Max 18 digits"),
     password: yup
       .string()
