@@ -1,8 +1,9 @@
-import axios from "axios";
+import axios from 'axios';
+import { API_ADDRESS_LOCAL, API_ADDRESS_PRODUCTION } from 'react-native-dotenv';
 
 const api = axios.create({
-  // baseURL: "https://gentle-savannah-77998.herokuapp.com/",
-  baseURL: "http://192.168.0.12:80",
+  // baseURL: API_ADDRESS_PRODUCTION,
+  baseURL: API_ADDRESS_LOCAL,
 });
 
 export default api;

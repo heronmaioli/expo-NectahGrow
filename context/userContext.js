@@ -23,7 +23,8 @@ export const UserProvider = ({ children }) => {
   const [isLoged, setIsLoged] = useState(false);
   const [user, setUser] = useState(null);
   const [hasConnection, setHasConnection] = useState(true);
-  console.log(boards);
+  const [prevRoom, setPrevRoom] = useState("");
+
   return (
     <UserContext.Provider
       value={{
@@ -33,6 +34,8 @@ export const UserProvider = ({ children }) => {
         setIsLoged,
         user,
         setUser,
+        prevRoom,
+        setPrevRoom,
       }}
     >
       {children}

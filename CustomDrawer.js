@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import { UserContext } from './context/userContext';
 
 export default function CustomDrawer(props) {
-  const { setUser, setIsLoged, setBoards } = useContext(UserContext);
+  const { setUser, setIsLoged } = useContext(UserContext);
   useEffect(() => {
     (async () => {
       try {
@@ -24,22 +24,11 @@ export default function CustomDrawer(props) {
     })();
   }, []);
 
-  async function logOut() {
-    try {
-      await AsyncStorage.removeItem("@persist");
-      await AsyncStorage.removeItem("@boards");
-      await AsyncStorage.removeItem("@userId");
-      setBoards([]);
-      setIsLoged(false);
-    } catch (err) {
-      console.log(err);
-    }
-  }
   return (
     <View style={{ flex: 1 }}>
       <DrawerContentScrollView {...props}>
         <DrawerItemList {...props} />
-        <DrawerItem label="LogOut" onPress={() => logOut()} />
+        <DrawerItem label="LogOut" onPress={() => props.logOut()} />
       </DrawerContentScrollView>
     </View>
   );

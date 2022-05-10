@@ -1,17 +1,16 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Button, Image, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import io from 'socket.io-client';
 
+import { UserContext } from '../../context/userContext';
 import api from '../../services/api';
 import Styles from './styles.scss';
 
-// const socket = io("https://gentle-savannah-77998.herokuapp.com/");
-const socket = io("http://192.168.0.12:80");
-
 export default function BoardScreen({ route }) {
-  const [boardId, setBoardsId] = useState(route?.params?.board);
+  const { prevRoom, setPrevRoom } = useContext(UserContext);
+  const [boardId, setBoardsId] = useState(route.params.board);
   const [lightState, setLightState] = useState("");
   const [inExaust, setInExaust] = useState(false);
   const [outExaust, setOutExaust] = useState(false);
@@ -28,10 +27,10 @@ export default function BoardScreen({ route }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!socket.connected) {
-      socket.connect();
-      console.log("connected");
-    }
+    socket.emit("leaveRoom", prevRoom);
+    setPrevRoom(route.params.board);
+    socket.emit("joinRoom", boardId);
+
     (async () => {
       try {
         const response = await api.get("/getStatus?boardId=" + boardId);
@@ -84,15 +83,11 @@ export default function BoardScreen({ route }) {
     }
   };
 
-  socket.on("connect", () => {
-    console.log("conected");
-  });
-  socket.emit("joinRoom", boardId);
-
   socket.on("sensorReads", (reads) => {
     setTemperature(reads.temperature);
     setHumidity(reads.humidity);
     console.log(reads);
+    console.log(boardId);
   });
   socket.on("setLightOn", () => {
     setLightState("ON");
@@ -123,7 +118,6 @@ export default function BoardScreen({ route }) {
     console.log("disconected");
   });
 
-  console.log(route);
   return (
     <View style={Styles.container}>
       <Text style={Styles.title}>{route.name}</Text>
@@ -336,12 +330,12 @@ export default function BoardScreen({ route }) {
                 </View>
               </View>
             </View>
-            {/* <Button
+            <Button
               title={"teste"}
               onPress={() => {
                 socket.emit("teste");
               }}
-            /> */}
+            />
           </>
         )}
       </View>
